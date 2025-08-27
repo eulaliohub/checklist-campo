@@ -31,7 +31,7 @@
   <!-- Datos generales -->
   <section class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-6 bg-white p-4 rounded-2xl shadow">
     <div>
-      <label class="block text-sm font-semibold">Campo/Huerta</label>
+      <label class="block text-sm font-semibold">Campo/Huerta </label>
       <input list="huertas" id="campo" class="w-full mt-1 p-2 border rounded-xl" placeholder="Ingresa o selecciona una huerta" />
       <datalist id="huertas">
         <option value="La Presa"></option>
