@@ -3,63 +3,351 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Checklist Campo – PrimusGFS v3.2 (Módulo 2)</title>
+  <title>Checklist Campo – PrimusGFS v3.2 (Mejorado)</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://unpkg.com/lucide@latest"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
-  <style>
-    input[type="file"] { display:none; }
-    .accordion-content { display: none; }
+  <style>input[type="file"]{display:none;} .accordion-content{display:none;} .critico-badge{background:#fee2e2;color:#991b1b;padding:.25rem .5rem;border-radius:.5rem;font-weight:600;font-size:.75rem;}
   </style>
 </head>
-<body class="bg-gray-50 min-h-screen">
-<div class="max-w-6xl mx-auto p-4 sm:p-8">
-  <header class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between mb-6">
-    <div>
-      <h1 class="text-2xl sm:text-3xl font-bold">Checklist de Campo – PrimusGFS v3.2</h1>
-      <p class="text-gray-600">Módulo 2: Granja (resumido para uso en campo)</p>
-    </div>
-    <div class="flex gap-2">
-      <button id="btnCalcular" class="px-4 py-2 rounded-xl bg-blue-600 text-white shadow hover:opacity-90">Calcular</button>
-      <button id="btnGuardar" class="px-4 py-2 rounded-xl bg-emerald-600 text-white shadow hover:opacity-90">Guardar</button>
-      <button id="btnPDF" class="px-4 py-2 rounded-xl bg-indigo-600 text-white shadow hover:opacity-90">Exportar PDF</button>
-      <button id="btnLimpiar" class="px-4 py-2 rounded-xl bg-gray-200 text-gray-700 shadow hover:opacity-90">Limpiar</button>
-    </div>
-  </header>
+<body class="bg-gray-50 min-h-screen text-gray-800">
+  <div class="max-w-7xl mx-auto p-4 sm:p-8">
+    <header class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
+      <div>
+        <h1 class="text-2xl sm:text-3xl font-bold">Checklist de Campo – PrimusGFS v3.2 (Mejorado)</h1>
+        <p class="text-gray-600">Módulo 2: Granja — Versión con progreso, filtros y export/import JSON</p>
+      </div>
 
-  <!-- Datos generales -->
+      <div class="flex flex-wrap gap-2">
+        <button id="btnCalcular" class="px-4 py-2 rounded-xl bg-blue-600 text-white">Calcular</button>
+        <button id="btnGuardar" class="px-4 py-2 rounded-xl bg-emerald-600 text-white">Guardar local</button>
+        <button id="btnSaveSnapshot" class="px-4 py-2 rounded-xl bg-amber-500 text-white">Guardar copia (.json)</button>
+        <label for="fileImport" class="px-4 py-2 rounded-xl bg-gray-200 text-gray-700 cursor-pointer">Importar .json</label>
+        <input id="fileImport" type="file" accept="application/json" />
+        <button id="btnExportPDF" class="px-4 py-2 rounded-xl bg-indigo-600 text-white">Exportar PDF</button>
+        <button id="btnLimpiar" class="px-4 py-2 rounded-xl bg-gray-200 text-gray-700">Limpiar</button>
+      </div>
+    </header>
+
+    <!-- Meta -->
   <section class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-6 bg-white p-4 rounded-2xl shadow">
-    <div>
-      <label class="block text-sm font-semibold">Campo/Huerta</label>
-      <input list="huertas" id="campo" class="w-full mt-1 p-2 border rounded-xl" placeholder="Ingresa o selecciona una huerta" />
-      <datalist id="huertas">
-        <option value="La Presa"></option>
-        <option value="Santa Lucía"></option>
-        <option value="Benazuza 1"></option>
-        <option value="Benazuza 2"></option>
-        <option value="Copalita 1"></option>
-        <option value="Copalita 2"></option>
-        <option value="El Colorado"></option>
-      </datalist>
-    </div>
-    <div>
-      <label class="block text-sm font-semibold">Evaluador</label>
-      <input id="evaluador" class="w-full mt-1 p-2 border rounded-xl" placeholder="Nombre del evaluador" />
-    </div>
-    <div>
-      <label class="block text-sm font-semibold">Fecha</label>
-      <input id="fecha" type="date" class="w-full mt-1 p-2 border rounded-xl" />
-    </div>
-  </section>
-
-  <!-- Checklist y dashboard aquí (idéntico al tuyo) -->
-
+<div>
+<label class="block text-sm font-semibold">Campo/Huerta</label>
+<input id="campo" class="w-full mt-1 p-2 border rounded-xl" placeholder="Ingrese nombre de campo/huerta" list="huertas-list" />
+<datalist id="huertas-list">
+<option value="La Presa">
+<option value="Santa Lucía">
+<option value="Benazuza 1">
+<option value="Benazuza 2">
+<option value="Copalita 1">
+<option value="Copalita 2">
+<option value="El Colorado">
+</datalist>
 </div>
+      <div>
+        <label class="block text-sm font-semibold">Evaluador</label>
+        <input id="evaluador" class="w-full mt-1 p-2 border rounded-xl" placeholder="Nombre del evaluador" />
+      </div>
+      <div>
+        <label class="block text-sm font-semibold">Fecha</label>
+        <input id="fecha" type="date" class="w-full mt-1 p-2 border rounded-xl" />
+      </div>
+    </section>
 
-<script>
-  // Todo el JS que ya tenías: banco de preguntas, persistencia, cálculo, PDF, etc.
-  // Solo asegúrate que el ID del campo de huerta es 'campo' como en este HTML.
-</script>
+    <!-- Controles adicionales -->
+    <section class="flex flex-wrap items-center gap-3 mb-4">
+      <div class="w-full sm:w-1/2">
+        <div class="w-full bg-gray-200 rounded-full h-4 overflow-hidden">
+          <div id="progressBar" class="h-4 rounded-full" style="width:0%; background:linear-gradient(90deg,#ef4444,#f59e0b,#10b981);"></div>
+        </div>
+        <div class="text-xs text-gray-500 mt-1">Progreso: <span id="progressText">0/0</span></div>
+      </div>
+
+      <div class="flex gap-2">
+        <button id="btnToggleCrit" class="px-3 py-1 rounded-lg bg-red-50 text-red-700 border">Mostrar solo críticos</button>
+        <button id="btnToggleNotes" class="px-3 py-1 rounded-lg bg-blue-50 text-blue-700 border">Mostrar solo con notas</button>
+        <button id="btnCompact" class="px-3 py-1 rounded-lg bg-gray-50 text-gray-700 border">Alternar compacto</button>
+        <button id="btnCollapseAll" class="px-3 py-1 rounded-lg bg-gray-50 text-gray-700 border">Colapsar/Expandir todos</button>
+      </div>
+    </section>
+
+    <!-- Checklist -->
+    <section id="checklist" class="space-y-4 mb-6"></section>
+
+    <!-- Dashboard -->
+    <section class="mt-8 grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <div class="bg-white p-4 rounded-2xl shadow">
+        <h2 class="text-lg font-bold mb-2">Resultados por Sección</h2>
+        <div class="overflow-x-auto">
+          <table class="w-full text-sm">
+            <thead class="bg-gray-100">
+              <tr>
+                <th class="text-left p-2">Sección</th>
+                <th class="text-right p-2">% Cumplimiento</th>
+                <th class="text-right p-2">Sí / No / N/A</th>
+              </tr>
+            </thead>
+            <tbody id="tablaResultados"></tbody>
+          </table>
+        </div>
+        <div class="mt-4 text-right">
+          <span id="scoreGlobal" class="text-xl font-extrabold"></span>
+        </div>
+      </div>
+      <div class="bg-white p-4 rounded-2xl shadow">
+        <h2 class="text-lg font-bold mb-2">Gráfica de Cumplimiento</h2>
+        <canvas id="chartSecciones" height="200"></canvas>
+      </div>
+    </section>
+
+    <!-- Observaciones generales -->
+    <section class="mt-8 bg-white p-4 rounded-2xl shadow">
+      <label class="block text-sm font-semibold">Observaciones generales</label>
+      <textarea id="obsGenerales" class="w-full mt-1 p-2 border rounded-xl" rows="4" placeholder="Notas relevantes, hallazgos críticos, acciones correctivas propuestas..."></textarea>
+    </section>
+
+    <footer class="mt-6 text-xs text-gray-500">Versión mejorada. Opciones: Sí (1) / No (0) / N/A (no pondera). Ítems críticos marcan alerta.</footer>
+  </div>
+
+  <!-- Templates -->
+  <template id="tplSection">
+    <div class="bg-white rounded-2xl shadow">
+      <button class="w-full flex items-center justify-between p-4 text-left group section-header">
+        <div>
+          <h3 class="text-base sm:text-lg font-bold section-title"></h3>
+          <p class="text-xs text-gray-500 mt-1 section-desc"></p>
+        </div>
+        <div class="flex items-center gap-3">
+          <span class="text-sm font-semibold text-gray-700 section-score">–</span>
+          <svg class="w-5 h-5 text-gray-400 group-hover:text-gray-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+          </svg>
+        </div>
+      </button>
+      <div class="accordion-content border-t p-4 space-y-4"></div>
+    </div>
+  </template>
+
+  <template id="tplQuestion">
+    <div class="p-3 border rounded-xl question-card">
+      <div class="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3">
+        <p class="text-sm sm:text-base font-medium question-text"></p>
+        <div class="flex items-center gap-3 flex-wrap">
+          <label class="inline-flex items-center gap-1 text-sm"><input type="radio" class="q-si" value="1"/> Sí</label>
+          <label class="inline-flex items-center gap-1 text-sm"><input type="radio" class="q-no" value="0"/> No</label>
+          <label class="inline-flex items-center gap-1 text-sm"><input type="radio" class="q-na" value="na"/> N/A</label>
+          <button class="px-2 py-1 text-xs border rounded-lg toggle-nota">Nota</button>
+        </div>
+      </div>
+      <div class="mt-2 hidden nota-wrap">
+        <textarea class="w-full p-2 border rounded-lg q-nota" rows="2" placeholder="Añadir evidencia/nota..."></textarea>
+      </div>
+      <p class="mt-2 text-xs text-red-600 hidden critico-msg">Ítem crítico: si está en "No", requiere acción inmediata.</p>
+    </div>
+  </template>
+
+  <script>
+    // Banco de preguntas (idéntico al anterior, agrupado por sección)
+    const BANK = [
+      {id:'2.01.01', text:'Política/objetivos de inocuidad visibles y comunicados.', critical:false, section:'2.01 Documentación General', desc:'Lineamientos básicos y evidencia documental.'},
+      {id:'2.01.02', text:'Mapa del campo y lotes actualizado.', critical:false, section:'2.01 Documentación General'},
+      {id:'2.01.03', text:'Registros de capacitaciones al personal de campo.', critical:false, section:'2.01 Documentación General'},
+      {id:'2.01.04', text:'Procedimientos (SOP) para labores clave (siembra, cosecha, limpieza, químicos).', critical:false, section:'2.01 Documentación General'},
+      {id:'2.01.05', text:'Plan de acción correctiva para no conformidades.', critical:true, section:'2.01 Documentación General'},
+      {id:'2.01.06', text:'Control de documentos y registros (firmas, fechas, versiones).', critical:false, section:'2.01 Documentación General'},
+
+      {id:'2.02.01', text:'Productos autorizados y vigentes; no uso de prohibidos.', critical:true, section:'2.02 Agroquímicos', desc:'Selección, almacenamiento, aplicación y registros.'},
+      {id:'2.02.02', text:'Almacén seguro: ventilación, señalización, segregación y llave.', critical:true, section:'2.02 Agroquímicos'},
+      {id:'2.02.03', text:'Registros completos de aplicaciones (fecha, lote, dosis, operario).', critical:false, section:'2.02 Agroquímicos'},
+      {id:'2.02.04', text:'PPE disponible y usado por aplicadores (guantes, goggles, respirador).', critical:true, section:'2.02 Agroquímicos'},
+      {id:'2.02.05', text:'Respeto de periodos de reentrada/PHI.', critical:true, section:'2.02 Agroquímicos'},
+      {id:'2.02.06', text:'Gestión de envases vacíos (triple lavado y acopio).', critical:false, section:'2.02 Agroquímicos'},
+
+      {id:'2.03.01', text:'Análisis de agua vigente por fuente y punto de uso.', critical:true, section:'2.03 Agua de Riego', desc:'Calidad, protección de fuentes y registros.'},
+      {id:'2.03.02', text:'Fuentes protegidas (pozos/tanques cerrados, sin contaminación).', critical:true, section:'2.03 Agua de Riego'},
+      {id:'2.03.03', text:'Registros de mantenimiento/limpieza en sistemas de riego.', critical:false, section:'2.03 Agua de Riego'},
+      {id:'2.03.04', text:'Separación de líneas fertilización/agua potable donde aplique.', critical:true, section:'2.03 Agua de Riego'},
+      {id:'2.03.05', text:'Respuesta ante resultados fuera de especificación.', critical:true, section:'2.03 Agua de Riego'},
+
+      {id:'2.04.01', text:'Capacitación en higiene y síntomas de enfermedad.', critical:true, section:'2.04 Higiene del Personal', desc:'Servicios, prácticas higiénicas y control de enfermedad.'},
+      {id:'2.04.02', text:'Sanitarios limpios y suficientes, con jabón/agua/papel.', critical:true, section:'2.04 Higiene del Personal'},
+      {id:'2.04.03', text:'Lavamanos accesibles y funcionales en campo.', critical:true, section:'2.04 Higiene del Personal'},
+      {id:'2.04.04', text:'Prohibido comer/fumar en áreas de cultivo.', critical:false, section:'2.04 Higiene del Personal'},
+      {id:'2.04.05', text:'Manejo adecuado de enfermedades/lesiones del personal.', critical:true, section:'2.04 Higiene del Personal'},
+
+      {id:'2.05.01', text:'Plan de limpieza/desinfección de herramientas y contenedores.', critical:true, section:'2.05 Herramientas y Equipo', desc:'Disponibilidad, mantenimiento y limpieza.'},
+      {id:'2.05.02', text:'Registros de limpieza con frecuencia definida.', critical:false, section:'2.05 Herramientas y Equipo'},
+      {id:'2.05.03', text:'Equipo de cosecha en buen estado (sin óxido/astillas).', critical:true, section:'2.05 Herramientas y Equipo'},
+      {id:'2.05.04', text:'Áreas de almacenamiento limpias y organizadas.', critical:false, section:'2.05 Herramientas y Equipo'},
+
+      {id:'2.06.01', text:'Instrucciones claras de cosecha (madurez, manipulación).', critical:false, section:'2.06 Cosecha', desc:'Prácticas higiénicas y manipulación inocua del producto.'},
+      {id:'2.06.02', text:'Higiene de cosechadores (manos limpias, uñas cortas, PPE).', critical:true, section:'2.06 Cosecha'},
+      {id:'2.06.03', text:'Contenedores limpios e íntegros antes de uso.', critical:true, section:'2.06 Cosecha'},
+      {id:'2.06.04', text:'Producto protegido del suelo y contaminantes.', critical:true, section:'2.06 Cosecha'},
+      {id:'2.06.05', text:'Rechazo/manejo de producto contaminado o dañado.', critical:true, section:'2.06 Cosecha'},
+
+      {id:'2.07.01', text:'Monitoreo de presencia de animales/pájaros en lotes.', critical:false, section:'2.07 Animales en el Campo', desc:'Prevención de contaminación por fauna.'},
+      {id:'2.07.02', text:'Medidas para excluir animales (cercas, repelentes, mallas).', critical:false, section:'2.07 Animales en el Campo'},
+      {id:'2.07.03', text:'Evaluación y delimitación de áreas con riesgo por heces.', critical:true, section:'2.07 Animales en el Campo'},
+
+      {id:'2.08.01', text:'Basura y residuos controlados; no hay acumulación en campo.', critical:false, section:'2.08 Residuos y Basura', desc:'Gestión de residuos y reciclaje.'},
+      {id:'2.08.02', text:'Contenedores cerrados, etiquetados y alejados del producto.', critical:false, section:'2.08 Residuos y Basura'},
+      {id:'2.08.03', text:'Disposición adecuada de residuos peligrosos.', critical:true, section:'2.08 Residuos y Basura'},
+
+      {id:'2.09.01', text:'Identificación de lotes en campo (códigos/etiquetas).', critical:true, section:'2.09 Trazabilidad en Campo', desc:'Identificación de lotes y registros de cosecha.'},
+      {id:'2.09.02', text:'Registros de cosecha por lote (fecha, cuadrilla, cantidad).', critical:false, section:'2.09 Trazabilidad en Campo'},
+      {id:'2.09.03', text:'Ensayo de trazabilidad realizado y documentado (mock recall).', critical:true, section:'2.09 Trazabilidad en Campo'}
+    ];
+
+    // Agrupar
+    const sectionsMap = {};
+    BANK.forEach(q => { if(!sectionsMap[q.section]) sectionsMap[q.section] = { desc: q.desc || '', items: [] }; sectionsMap[q.section].items.push(q); });
+
+    // Elementos
+    const checklistEl = document.getElementById('checklist');
+    const tplSection = document.getElementById('tplSection');
+    const tplQuestion = document.getElementById('tplQuestion');
+
+    // Flags
+    let filterCritOnly = false; let filterNotesOnly = false; let compact = false; let allCollapsed = false;
+
+    // Render UI
+    Object.entries(sectionsMap).forEach(([sectionName, data], idx) => {
+      const secNode = tplSection.content.cloneNode(true);
+      const container = secNode.querySelector('.accordion-content');
+      secNode.querySelector('.section-title').textContent = `${sectionName}`;
+      secNode.querySelector('.section-desc').textContent = data.desc;
+
+      data.items.forEach(q => {
+        const qNode = tplQuestion.content.cloneNode(true);
+        qNode.querySelector('.question-text').textContent = `${q.id} ${q.text}`;
+        const radioSi = qNode.querySelector('.q-si');
+        const radioNo = qNode.querySelector('.q-no');
+        const radioNa = qNode.querySelector('.q-na');
+        const nota = qNode.querySelector('.q-nota');
+        const notaWrap = qNode.querySelector('.nota-wrap');
+        const critMsg = qNode.querySelector('.critico-msg');
+        if(q.critical) critMsg.classList.remove('hidden');
+
+        const name = `q_${q.id.replace(/\./g,'_')}`;
+        radioSi.name = name; radioNo.name = name; radioNa.name = name;
+
+        const saved = loadAnswer(name);
+        if(saved){ if(saved.value === '1') radioSi.checked = true; if(saved.value === '0') radioNo.checked = true; if(saved.value === 'na') radioNa.checked = true; nota.value = saved.note || ''; if(nota.value) notaWrap.classList.remove('hidden'); }
+
+        qNode.querySelector('.toggle-nota').addEventListener('click',()=>{ notaWrap.classList.toggle('hidden'); });
+        [radioSi, radioNo, radioNa].forEach(r => r.addEventListener('change',()=>{ saveAnswer(name, r.value, nota.value); updateSectionScore(sectionName); renderDashboard(); renderProgress(); }));
+        nota.addEventListener('input', ()=>{ const checked = document.querySelector(`input[name="${name}"]:checked`); saveAnswer(name, checked ? checked.value : null, nota.value); });
+
+        container.appendChild(qNode);
+      });
+
+      // Acordeón
+      const wrapper = document.createElement('div'); wrapper.appendChild(secNode);
+      const headerBtn = wrapper.querySelector('button');
+      const body = wrapper.querySelector('.accordion-content');
+      headerBtn.addEventListener('click',()=>{ body.style.display = body.style.display === 'none' || body.style.display === '' ? 'block' : 'none'; });
+      body.style.display = idx === 0 ? 'block' : 'none';
+
+      checklistEl.appendChild(wrapper.firstElementChild);
+    });
+
+    // Persistencia
+    function saveAnswer(key, value, note){ const data = JSON.parse(localStorage.getItem('primus_mod2_answers')||'{}'); data[key] = { value, note }; localStorage.setItem('primus_mod2_answers', JSON.stringify(data)); }
+    function loadAnswer(key){ try{ return JSON.parse(localStorage.getItem('primus_mod2_answers')||'{}')[key]; }catch(e){console.warn('Error cargando localStorage',e); return null;} }
+    function getAllAnswers(){ try{return JSON.parse(localStorage.getItem('primus_mod2_answers')||'{}'); }catch(e){return {};}}
+
+    // Calculos
+    function calcSection(sectionName){ const items = sectionsMap[sectionName].items; let yes=0,no=0,na=0,total=0,critNo=0; items.forEach(q=>{ const name = `q_${q.id.replace(/\./g,'_')}`; const ans = loadAnswer(name); if(ans && ans.value!==null && ans.value!==undefined){ if(ans.value==='1'){ yes++; total++; } else if(ans.value==='0'){ no++; total++; if(q.critical) critNo++; } else if(ans.value==='na'){ na++; } } }); const pct = total>0 ? Math.round((yes/total)*100) : 0; return { yes, no, na, pct, critNo, total }; }
+
+    function updateSectionScore(sectionName){ const card = Array.from(document.querySelectorAll('.section-title')).find(el=>el.textContent===sectionName)?.closest('.bg-white'); if(!card) return; const {pct, yes, no, na, critNo} = calcSection(sectionName); const scoreEl = card.querySelector('.section-score'); scoreEl.textContent = `${pct}%` + (critNo>0?` ⚠️ ${critNo} crítico(s) en No`: ''); if(critNo>0) card.classList.add('ring','ring-red-200'); else card.classList.remove('ring','ring-red-200'); }
+
+    function renderAllSectionScores(){ Object.keys(sectionsMap).forEach(updateSectionScore); }
+
+    function renderDashboard(){ const tbody = document.getElementById('tablaResultados'); tbody.innerHTML = ''; const labels = []; const dataPct = []; let sum=0, count=0; Object.keys(sectionsMap).forEach(sec=>{ const {yes,no,na,pct,critNo,total} = calcSection(sec); const tr = document.createElement('tr'); tr.innerHTML = `<td class="p-2">${sec}${critNo>0? ' <span class="text-red-600">(⚠️ '+critNo+' crítico)</span>':''}</td><td class="p-2 text-right font-semibold">${pct}%</td><td class="p-2 text-right">${yes} / ${no} / ${na}</td>`; tbody.appendChild(tr); labels.push(sec.split(' ')[0]); dataPct.push(pct); sum += pct; count++; }); const global = count>0 ? Math.round(sum/count) : 0; document.getElementById('scoreGlobal').textContent = `Cumplimiento Global: ${global}%`; drawChart(labels, dataPct); }
+
+    // Chart con colores por rango
+    let chart;
+    function drawChart(labels, data){ const ctx = document.getElementById('chartSecciones').getContext('2d'); if(chart) chart.destroy(); const bg = data.map(v=> v>=90? 'rgba(16,185,129,0.6)' : v>=70? 'rgba(245,158,11,0.6)' : 'rgba(239,68,68,0.6)'); chart = new Chart(ctx, { type: 'bar', data: { labels, datasets: [{ label: '% por sección', data, backgroundColor: bg }] }, options:{ responsive:true, plugins:{ legend:{ display:false } }, scales:{ y:{ beginAtZero:true, max:100 } } } }); }
+
+    // Progress
+    function renderProgress(){ const all = BANK.length; let answered=0; Object.values(getAllAnswers()).forEach(a=>{ if(a && (a.value==='1' || a.value==='0' || a.value==='na')) answered++; }); const pct = all>0? Math.round((answered/all)*100):0; document.getElementById('progressBar').style.width = pct+'%'; document.getElementById('progressText').textContent = `${answered}/${all} (${pct}%)`; }
+
+    // Filtros
+    function applyFilters(){ const cards = Array.from(document.querySelectorAll('.question-card')); cards.forEach(card=>{ card.classList.remove('hidden'); const qText = card.querySelector('.question-text').textContent; const note = card.querySelector('.q-nota').value; const isCritical = qText.indexOf('(CRÍTICO)')>-1 || card.querySelector('.critico-msg') && !card.querySelector('.critico-msg').classList.contains('hidden'); if(filterCritOnly){ // show only critical questions
+          if(!card.querySelector('.critico-msg') || card.querySelector('.critico-msg').classList.contains('hidden')) card.classList.add('hidden');
+        }
+        if(filterNotesOnly){ if(!note || note.trim()==='') card.classList.add('hidden'); }
+        if(compact){ card.classList.add('p-2'); card.querySelector('.question-text').classList.add('text-sm'); } else { card.classList.remove('p-2'); card.querySelector('.question-text').classList.remove('text-sm'); }
+    }); }
+
+    document.getElementById('btnToggleCrit').addEventListener('click', ()=>{ filterCritOnly = !filterCritOnly; document.getElementById('btnToggleCrit').classList.toggle('bg-red-600'); document.getElementById('btnToggleCrit').classList.toggle('text-white'); applyFilters(); });
+    document.getElementById('btnToggleNotes').addEventListener('click', ()=>{ filterNotesOnly = !filterNotesOnly; document.getElementById('btnToggleNotes').classList.toggle('bg-blue-600'); document.getElementById('btnToggleNotes').classList.toggle('text-white'); applyFilters(); });
+    document.getElementById('btnCompact').addEventListener('click', ()=>{ compact = !compact; document.getElementById('btnCompact').classList.toggle('bg-gray-800'); document.getElementById('btnCompact').classList.toggle('text-white'); applyFilters(); });
+
+    document.getElementById('btnCollapseAll').addEventListener('click', ()=>{ allCollapsed = !allCollapsed; const bodies = document.querySelectorAll('.accordion-content'); bodies.forEach(b=> b.style.display = allCollapsed? 'none':'block'); });
+
+    // Export/Import JSON
+    function downloadJSON(filename, data){ const blob = new Blob([JSON.stringify(data, null, 2)], {type:'application/json'}); const url = URL.createObjectURL(blob); const a = document.createElement('a'); a.href = url; a.download = filename; document.body.appendChild(a); a.click(); a.remove(); URL.revokeObjectURL(url); }
+
+    document.getElementById('btnSaveSnapshot').addEventListener('click', ()=>{
+      const payload = { meta: getMeta(), answers: getAllAnswers(), obs: document.getElementById('obsGenerales').value, savedAt: new Date().toISOString() };
+      const filename = `checklist_primus_mod2_${new Date().toISOString().slice(0,19).replace(/[:T]/g,'_')}.json`;
+      downloadJSON(filename, payload);
+    });
+
+    document.getElementById('fileImport').addEventListener('change', (e)=>{
+      const f = e.target.files[0]; if(!f) return; const reader = new FileReader(); reader.onload = ()=>{ try{ const data = JSON.parse(reader.result); if(data.answers){ localStorage.setItem('primus_mod2_answers', JSON.stringify(data.answers)); if(data.meta) localStorage.setItem('primus_mod2_meta', JSON.stringify(data.meta)); if(data.obs) document.getElementById('obsGenerales').value = data.obs; alert('Importación completada.'); location.reload(); }else{ alert('Archivo JSON no tiene formato esperado (falta .answers).'); } }catch(err){ alert('Error leyendo JSON: '+err.message); } }; reader.readAsText(f);
+    });
+
+    function getMeta(){ return { campo: document.getElementById('campo').value, evaluador: document.getElementById('evaluador').value, fecha: document.getElementById('fecha').value }; }
+
+    // Guardar meta
+    document.getElementById('btnGuardar').addEventListener('click', ()=>{ localStorage.setItem('primus_mod2_meta', JSON.stringify(getMeta())); localStorage.setItem('primus_mod2_obs', document.getElementById('obsGenerales').value); alert('Datos guardados en este dispositivo.'); });
+
+    // Limpiar
+    document.getElementById('btnLimpiar').addEventListener('click', ()=>{ if(confirm('¿Limpiar todas las respuestas guardadas?')){ localStorage.removeItem('primus_mod2_answers'); localStorage.removeItem('primus_mod2_meta'); localStorage.removeItem('primus_mod2_obs'); location.reload(); } });
+
+    // PDF export (mejor manejo)
+    async function ensureJsPDF(){ if(window.jspdf && window.jspdf.jsPDF) return; try{ const s = document.createElement('script'); s.src = 'https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js'; document.head.appendChild(s); await new Promise(r=>s.onload=r); }catch(e){ console.warn('No se cargó jsPDF',e); } }
+
+    async function exportPDF(){ await ensureJsPDF(); let doc; if(window.jspdf && window.jspdf.jsPDF){ const JsPDFClass = window.jspdf.jsPDF; doc = new JsPDFClass('p','pt','a4'); }else if(typeof window.jsPDF !== 'undefined'){ doc = new window.jsPDF('p','pt','a4'); }else{ alert('No fue posible cargar jsPDF.'); return; }
+      try{
+        doc.setFontSize(14); doc.text('Checklist de Campo – PrimusGFS v3.2 (Mejorado)', 40, 50);
+        doc.setFontSize(10); doc.text(`Campo: ${document.getElementById('campo').value}`, 40, 70);
+        doc.text(`Evaluador: ${document.getElementById('evaluador').value||'-'}`, 40, 85);
+        doc.text(`Fecha: ${document.getElementById('fecha').value||'-'}`, 40, 100);
+        const dash = document.querySelector('section.mt-8.grid');
+        const canvas = await html2canvas(dash, { scale: 2 });
+        const imgData = canvas.toDataURL('image/png');
+        const pageWidth = doc.internal.pageSize.getWidth(); const ratio = canvas.width/canvas.height; const imgW = pageWidth-80; const imgH = imgW/ratio; doc.addImage(imgData, 'PNG', 40, 120, imgW, imgH);
+        let y = 130 + imgH; doc.setFontSize(12); doc.text('Observaciones generales:', 40, y); doc.setFontSize(10); const obs = (document.getElementById('obsGenerales').value||'').split('\n'); y+=16; obs.forEach(line=>{ if(y>780){ doc.addPage(); y=40; } doc.text(line, 40, y); y+=14; });
+        y+=10; doc.setFontSize(12); doc.text('Detalle de hallazgos (No / Críticos / Notas):', 40, y); y+=16; doc.setFontSize(10);
+        Object.keys(sectionsMap).forEach(sec=>{
+          const items = sectionsMap[sec].items; let printedHeader=false;
+          items.forEach(q=>{ const name = `q_${q.id.replace(/\./g,'_')}`; const ans = loadAnswer(name); const show = ans && (ans.value==='0' || (ans.note && ans.note.trim())); if(show){ if(!printedHeader){ doc.setFont(undefined,'bold'); doc.text(sec, 40, y); doc.setFont(undefined,'normal'); y+=14; printedHeader=true; }
+              let line = `${q.id} ${q.text} – Resp: ${ans.value==='0'?'No':ans.value==='1'?'Sí':'N/A'}${q.critical?' (CRÍTICO)':''}`;
+              const wrapped = doc.splitTextToSize(line, pageWidth-80);
+              wrapped.forEach(w=>{ if(y>780){ doc.addPage(); y=40; } doc.text(w, 60, y); y+=14; });
+              if(ans.note){ const nWrapped = doc.splitTextToSize('Nota: '+ans.note, pageWidth-100); nWrapped.forEach(w=>{ if(y>780){ doc.addPage(); y=40; } doc.text(w, 80, y); y+=14; }); }
+              y+=6; }
+          }); if(printedHeader) y+=6;
+        });
+        doc.save(`Checklist_Primus_Mod2_EULALIO ZARAGOZA_${new Date().toISOString().slice(0,10)}.pdf`);
+      }catch(e){ console.error(e); alert('Error generando PDF: '+e.message); }
+    }
+
+    document.getElementById('btnExportPDF').addEventListener('click', exportPDF);
+
+    // Inicializar meta
+    (function init(){ const meta = JSON.parse(localStorage.getItem('primus_mod2_meta')||'{}'); if(meta.campo) document.getElementById('campo').value = meta.campo; if(meta.evaluador) document.getElementById('evaluador').value = meta.evaluador; if(meta.fecha) document.getElementById('fecha').value = meta.fecha; const obs = localStorage.getItem('primus_mod2_obs'); if(obs) document.getElementById('obsGenerales').value = obs; renderAllSectionScores(); renderDashboard(); renderProgress(); applyFilters(); })();
+
+    // Botón calcular
+    document.getElementById('btnCalcular').addEventListener('click', ()=>{ renderAllSectionScores(); renderDashboard(); renderProgress(); document.getElementById('scoreGlobal').scrollIntoView({behavior:'smooth', block:'center'}); });
+
+    // Auto-guardar leve (sin spam): guarda meta y observaciones cada cierto tiempo
+    setInterval(()=>{ localStorage.setItem('primus_mod2_meta', JSON.stringify(getMeta())); localStorage.setItem('primus_mod2_obs', document.getElementById('obsGenerales').value); }, 15000);
+  </script>
 </body>
 </html>
